@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import './App.css';
 import Template from './components/Template';
 import TodoList from './components/TodoList';
-import { MdAddCircleOutline, MdAddCircle, MdRealEstateAgent } from 'react-icons/md';
+import TodoInsert from './components/TodoInsert';
+import { MdAddCircle } from 'react-icons/md';
 
+let nextId = 3;
 const App = () => {
+  const [insertToggle, setInsertToggle] = useState(false);
   const [todos, setTodos] = useState([
     {
       id: 1,
@@ -18,14 +21,45 @@ const App = () => {
       checked: false,
     },
   ]);
+  const onInsertToggle = () => {
+    setInsertToggle(!insertToggle);
+  };
+
+  const onInsertTodo = (text) => {
+    if (text === '') {
+      return alert('할 일을 입력해주세요.');
+    } else {
+      const todo = {
+        id: nextId,
+        text,
+        checked: false,
+      };
+      setTodos((todos) => todos.concat(todo));
+    }
+    nextId++;
+  };
+
+  const onCheckToggle = (id) => {
+    setTodos((todos) =>
+      todos.map((todo) => (todo.id === id ? { ...todo, checked: !todo.checked } : todo))
+    );
+  };
 
   return (
     <div>
       <Template todoLength={todos.length}>
-        <TodoList todos={todos} />
-        <div className="add_todo_button">
+        <TodoList todos={todos} onCheckToggle={onCheckToggle} />
+        <div className="add_todo_button" onClick={onInsertToggle}>
           <MdAddCircle />
         </div>
+        {/* insertToggle이 true인 경우에만 컴포넌트 노출 */}
+        {insertToggle && (
+          <TodoInsert
+            onInsertToggle={onInsertToggle}
+            onClick={onInsertToggle}
+            onInsetTodo={onInsertTodo}
+          />
+        )}
       </Template>
     </div>
   );
